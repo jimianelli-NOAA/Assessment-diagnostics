@@ -1,0 +1,315 @@
+---
+title: 'Guidance on common model diagnostics used in fisheries stock assessments across US Regions: application, challenges, and future directions'
+author: "Assessment methods working group"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    highlight: zenburn
+    fig_caption: yes
+    includes:
+    keep_tex: yes
+  word_document:
+    toc: true
+    reference_docx: word-styles-reference.docx
+  html_document:
+    toc: true
+    df_print: paged
+fontsize: 11pt
+header-includes:
+geometry: margin=1in
+---
+
+
+ \tableofcontents
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+\pagebreak
+
+# Introduction
+The following sets of stock assessment diagnostics were compiled as a 
+compendium of evolving approaches. For each approach, the structure of the evaluation was:
+
+  * Use of method,  *E.g. what is it used to test for or indicate and what question is it used to answer?*
+  * Specific diagnostics  *E.g., what types of plots, statistics, etc. are shown*
+  * Do the diagnostics provide indications of whether the model should "pass" or "fail"? 
+  * What type of follow up considerations are made based on the diagnostics?
+  * Other issues related to diagnostics
+  * Examples (assessments, journal articles, user manuals, etc.)
+
+The first section deals with diagnostics on model convergence followed by a central section on 
+diagnostics for goodness-of-fit. Subsequent sections cover types of sennsitivity analyses and other practices
+that can provide insight and communication on assessment methods and results. 
+
+# Data screening
+
+
+# Model convergence
+Lack of convergence can indicate poor model specification (e.g., 
+overparameterized) or that part or all of the data fit poorly (e.g., 
+there may be data conflicts).
+Convergence, either for optimization or posterior distribution integration (but
+ see MCMC below) indicates a stable, repeatable set of estimates. 
+
+Specific diagnostics include examining if
+parameter estimates are near or at bounds, if the final gradients are small
+in magnitude, and if Hessian matrix invertible. 
+
+Indications of success includes:
+
+  - Positive definite Hessian-indicates that the base case model had converged to a local or global minimum
+  - final gradients are all close to zero
+  - parameter estimates away from bounds
+  - parameter correlations are reasonable (not close to 1.0)
+
+For follow-up considerations:
+
+  - Are the data informative for all model components? Are all parameters identifiable? Will more informative priors help? If the final gradient is too large, is there a scaling issue?
+  - Adjust parameter bounds, apply prior distributions, simplify model (fix parameters), play with phases
+  - strip the model down to an age-structured production model, add additional data sets one at a time
+  - consider alternative model parameterizations (e.g., spline selectivity)
+  - natural vs. no natural bounds?   [dunno wut this is nor where it belongs...]
+  - likelihood penalty terms << total likelihood
+
+Examples:
+
+## Alternative initial parameter values 
+[This approach was moved to convergence heading...]
+
+This used to determine if solutions are robust to or sensitive to initial
+guesses of parameter values.  - provides confirmatory evidence (increases
+probability?) that a global minimum has been obtained  
+
+One approach is to randomize starting values and plot each case on x-axis vs negative log likelihood of the fitted model on the y-axis.  A model robust to
+initial values will consistently converge on the same NLL. Models that fail this (show variability) should be evaluated to understand why certain starting parameter values failed (e.g., by examining the path of different data and prior components of the NLL changed through the estimation.
+
+As a follow-up one could plot parameter estimates from all the random restarts to pinpoint which parameter estimates are stable and which ones are not under the current configuration. This can help the analyst target which components of the model require attention (e.g., revise the structure of those components or add informative priors). 
+
+Examples:
+
+# Goodness-of-fit 
+These sets of diagnostics examine the statistical properties of
+how consistent a conditioned model is with available data.
+
+These include:
+
+  - residual plots (consistent with scale parameters)
+  - time series plots of observed and predicted values 
+  - root squared mean error estimates
+  - Information criteria
+
+For "good" model fits one would like:
+
+  - relatively low RMSE values (i.e., RMSE < 0.3) 
+  - residual series that vary randomly (i.e., "runs" of positive and negative residuals is undesireable)
+  - a model that is either an ensemble of plausible results or one that has the best statistical fit and model structure compared to plausible alternatives (but see sensitivity analyses below) 
+  -  Model produces posterior predictive distributions consistent with observed data 
+
+Sometimes qualitative factors are used in judging model fits.
+
+For follow-up, Attempt to isolate the problematic issue and fix it; the
+approach to doing this is case-specific and depends on what the problem is.
+
+Additional issues for discussion remain, such as "How big is a bad residual?"
+Does adding variance to an index 'improve' model fit? Are structural changes to model appropriate? E.g., should process errors be explicitly considered to obtain fits consistent with what's known about data?
+
+Examples:
+
+# Sensitivity analysis 
+## Basic robustness to assumptions
+Typically a reference model (or ensemble) is selected from which sensitivities to 
+assumptions are made. These provide an evaluation of uncertainty in model results 
+as typically relates to structural uncertainty. They give a means 
+to better understand sources of uncertainty beyond parameter and process 
+errors (if included in reference model).
+
+The statistics would include tables of key parameters. For example,
+include M, steepness, release mortality, features from previous assessment (if
+applicable), scale of removals, and any other feature warranted. Often,
+sensitivity runs are identified by branching points in decision making (must
+make a choice, what if we had decided otherwise?) 
+
+Example sensitivities include:
+
+  - alternative methods for data weighting
+  - Inclusion/Exclusion of individual data sets (e.g. by data type or fleet) 
+  - alternative priors
+
+Consistency among data sets--are model results driven by a small subset of
+the data? How influential are priors?
+
+As follow-up from sensitivity analyses might include a better,
+more formal, treatment of uncertainty, such as developing an ensemble.
+Other times, sensitivity runs simply indicate robustness to 
+what-if scenarios.
+
+Additional issues for discussion 
+
+Examples:
+
+## Likelihood profiles
+The purpose of this diagnostic can provide:
+
+  - justification that parameters are reasonably well-estimated or within plausible likelihood surface
+  - clues on model misspecification
+  - information on model conflict with priors and data components
+
+Plots of parameter value (fixed during optimization) on the x-axis, and NLL on
+the y-axis. Almost always profile on steepness and R0, and other parameters as
+needed for insight. Profiles of total NLL as well as components of the likelihood
+(e.g. lengths, ages, indices) can help identify conflicts.
+
+Profiles over natural mortality and, if there is a stock recruitment
+relationship, steepness are also useful.
+
+Looking for well-defined minimum or region where the likelihood response is
+relatively flat. Also look for consistency in minimum across data components 
+
+Unexplained, abrupt changes in profiles 
+
+As a follow-up, if data provide no information on a parameter, SE fixes it,
+either based on external information or at the midpoint of the region where
+the profile is flat.
+
+This diagnostic is probably best performed relatively early on in building the
+model.
+
+Examples:
+
+## Age-structured production model 
+
+[This seems to belong with sensitivity analysis?]
+
+Evaluate the consistency of relative abundance trends in the absence of size
+composition data and is common with   data-limited stocks (SWFSC).
+The method can be used to evaluate the relative influence of abundance indices vs. other data types 
+(e.g. composition data). When used as a diagnostic tool, evidence of lack of fit to composition data (SW)
+  The model results and figures (e.g., in stock synthesis) are as in other models, just typically a smaller data set.
+
+Follow-up notes are that this method is used to gain insight into the more highly parameterized age-structured models rather than a candidate model for selection consideration.
+
+Examples:
+
+## Retrospective analysis
+The goals of this include looking for how dependent the current model results are on the most recent data as well as looking for trends indicating that the model is consistently over- or underestimating quantities of interest.
+
+  - Routinely included unless it's an update or operational assessment (SE, SW, NW)
+
+Time series plots of spawning biomass from the current model compared to those
+in which data from each of the past 5 years are successively removed. 
+
+  - Time series plots of ~5 yr peels of recruitment, F, abundance, and status indicators 
+  - Evaluation is qualitative. We don't use Mohn's Rho or other quantitative summary statistics. 
+  - Looking for patterns of over- or underestimation in the terminal year 
+
+Evaluation can be qualitative and application in different regions vary. Typically just a diagnostic
+but in some settings (e.g., ICES benchmarks), a poor retrospective pattern can impact whether an assessment
+qualifies for catch advice. In determining the significance, having F or SSB be outside of the 90% confidence 
+region from base model is classified as a major retrospective bias. 
+In the NE, if major retrospective bias is detected a retrospective adjustment is applied to model results 
+for stock status determinations. The adjustment is also applied to stock projections. 
+Changes to a model can be attempted to try to rectify a poor retrospective patterns.  Mostly, this type of analysis
+is used to communicate and explain the potential causes of the observed pattern. For example, an abrupt change
+in retrospective patterns occurred for Alaska's Aleutian Island Atka mackerel stock. By evaluating the cumulative
+NLL over the assessment period for each data component, the link in retrospective pattern could clearly be linked to
+a survey effect.
+
+Additional issues for discussion 
+
+Examples:
+
+# Other practices(?)
+## MCMC and Bayesian integration
+
+The use of Monte-Carlo Markov Chains (MCMC) to sample and integrate over posterior distributions in assessment models
+has been available at least since the early 1990s. However, for complex, integrated, high dimensional assessment
+models the application has been limited due to computational issues and the need to more fully specify 
+defensible prior distributions for parameters. Nonetheless, MCMC can be useful diagnostic for such models
+even if only to identify parameters that are poorly defined, near a bound, and/or confounded in pathological
+ways (See Monnahan et al. 20??). Recent developments on *very* efficient MCMC sampling routines (no-U-turn sampler)
+implemented in ADMB and TMB (via STAN) greatly enhances the applicability for this approach.
+MCMC may help diagnose overparameterized models and, when converged, can provide intuitive marginal distributions 
+of quantities of interest without the need for, e.g., multivariate normal assumptions when using 
+asymptotic approximations.
+
+Use of weakly informative priors can improve model stability
+
+Diagnostics for MCMC include: autocorrelation of chain, Effective Sample Size, MCSE, multiple chains, 
+trace plots, HMC-NUT Diagnostics (see Rstan shiny app), and pairwise plots.
+
+SIR, AIS: entropy, resampling weights
+
+For any Bayesian integration method, comparison of the standard errors of parameter of interest with the marginals
+from the posterior should be done (are the lacation and scale parameters similar?).
+
+Follow-up on issues detected from MCMC integrations could include a presentation on how marginals differ from
+asymptotic approximations and perhaps more consideration of model mis-specifications. Ideally process
+error variances can be estimated simultaneously but consideration of data weight applications is also requred.
+
+Evaluation of prior predictive distributions for key model outputs (reference points, etc.)
+
+Additional issues for discussion 
+
+Examples:
+
+## Parametric bootstrap analysis 
+[is this a diagnostic?]
+
+This is used analyze model performance and provide a type of variance estimation.
+
+Comparison plots of parameter distributions estimated from bootstrapped
+runs with parameter estimates from base run. Typically one would examine
+the R0, steepness, sigmaR, SSB (virgin, current), recruitment (virgin, current), current F,
+current depletion, inital Fs, terminal Fs estimates. Also look at plots 
+in derived quantities (recruitment, F, SSB) for each of the runs.
+
+Looking for fit to the data that is randomly distributed according to the assumed error distribution (SE)
+
+If parameter estimates differ between bootstrapping and the original model fit may 
+indicate data conflict and model mis-specification.
+
+As follow-up,  if bootstrap analysis reveals poor trends, re-evaluate parameterization. 
+
+Examples:
+
+## Cross-validation skill testing
+
+[something I thought was missing...]
+
+## Jack-knife analysis  
+
+[is this where cross validation might also be described?]
+
+Determine how sensitive model results are to the removal of subsequent indices of abundance [seems like part of sensitivity analysis, also am unsure what this actually is, removal of full series? Last year?]
+
+Time series plots of recruitment, F, abundance, and status indicators 
+
+Looking for indices that may be giving conflicting abundance trend signals compared to the other indices. 
+Goal is to identify where data are having the largest influence in model result.
+
+For follow-up  model adjustments based on jack-knife analysis are rare as it is primarily used to provide managers 
+with an understanding of how sensitive the model outcomes are to the indices of abundance that are included 
+in the model.
+
+Examples:
+
+
+## Empirical analyses 
+
+[Is this a diagnostic tool?]
+
+This is listed as an alternative model framework intended to provide support for scale/trend of base model results.
+
+Model outputs are generally similar displays of 
+trends and/or scale from several model versions support current configuration
+
+Clearly different results (ie different conclusions about stock status) might be an indication of problems.
+
+For follow-up these are considered as a  "Plan B" assessment approach and can
+sometimes be used for management.
+
+Additional issues for discussion 
+
+Examples:
+
